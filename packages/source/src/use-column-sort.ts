@@ -8,16 +8,10 @@ function cellToSortData(c: GridCell): string {
             return c.data?.toString() ?? "";
         case GridCellKind.Boolean:
             return c.data?.toString() ?? "";
-        case GridCellKind.Markdown:
         case GridCellKind.RowID:
         case GridCellKind.Text:
         case GridCellKind.Uri:
             return c.data ?? "";
-        case GridCellKind.Bubble:
-        case GridCellKind.Image:
-            return c.data.join("");
-        case GridCellKind.Drilldown:
-            return c.data.map(x => x.text).join("");
         case GridCellKind.Protected:
         case GridCellKind.Loading:
             return "";
