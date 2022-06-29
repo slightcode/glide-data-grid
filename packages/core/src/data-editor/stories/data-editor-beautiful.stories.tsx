@@ -163,27 +163,6 @@ function clearCell(cell: GridCell): GridCell {
                 data: false,
             };
         }
-        case GridCellKind.Image: {
-            return {
-                ...cell,
-                data: [],
-                displayData: [],
-            };
-        }
-        case GridCellKind.Drilldown:
-        case GridCellKind.Bubble: {
-            return {
-                ...cell,
-                data: [],
-            };
-        }
-        case GridCellKind.Uri:
-        case GridCellKind.Markdown: {
-            return {
-                ...cell,
-                data: "",
-            };
-        }
         case GridCellKind.Text: {
             return {
                 ...cell,
@@ -1390,21 +1369,6 @@ function getColumnsForCellTypes(): GridColumnWithMockingInfo[] {
             },
         },
         {
-            title: "Image",
-            width: 120,
-            icon: GridColumnIcon.HeaderImage,
-            hasMenu: false,
-            getContent: () => {
-                return {
-                    kind: GridCellKind.Image,
-                    data: [`${faker.image.animals(40, 40)}?random=${faker.datatype.number(100000)}`],
-                    allowOverlay: true,
-                    allowAdd: false,
-                    readonly: true,
-                };
-            },
-        },
-        {
             title: "Uri",
             width: 120,
             icon: GridColumnIcon.HeaderUri,
@@ -1414,60 +1378,6 @@ function getColumnsForCellTypes(): GridColumnWithMockingInfo[] {
                 return {
                     kind: GridCellKind.Uri,
                     data: url,
-                    allowOverlay: true,
-                };
-            },
-        },
-        {
-            title: "Markdown",
-            width: 120,
-            icon: GridColumnIcon.HeaderMarkdown,
-            hasMenu: false,
-            getContent: () => {
-                const markdown = `# Title
-Hello my name is *${faker.name.firstName()}*
-
-## TODO:
-Try out [Glide](https://www.glideapps.com/)
-`;
-                return {
-                    kind: GridCellKind.Markdown,
-                    data: markdown,
-                    allowOverlay: true,
-                };
-            },
-        },
-        {
-            title: "Bubble",
-            width: 120,
-            icon: GridColumnIcon.HeaderArray,
-            hasMenu: false,
-            getContent: () => {
-                return {
-                    kind: GridCellKind.Bubble,
-                    data: [faker.lorem.word(), faker.lorem.word(), faker.lorem.word()],
-                    allowOverlay: true,
-                };
-            },
-        },
-        {
-            title: "Drilldown",
-            width: 120,
-            icon: GridColumnIcon.HeaderArray,
-            hasMenu: false,
-            getContent: () => {
-                return {
-                    kind: GridCellKind.Drilldown,
-                    data: [
-                        {
-                            text: faker.address.cityName(),
-                            img: `${faker.image.nature(40, 40)}?random=${faker.datatype.number(100000)}`,
-                        },
-                        {
-                            text: faker.address.cityName(),
-                            img: `${faker.image.nature(40, 40)}?random=${faker.datatype.number(100000)}`,
-                        },
-                    ],
                     allowOverlay: true,
                 };
             },
@@ -3101,140 +3011,6 @@ export const PreventDiagonalScroll: React.VFC = () => {
     );
 };
 (PreventDiagonalScroll as any).parameters = {
-    options: {
-        showPanel: false,
-    },
-};
-
-// A few supported mime types for drag and drop into cells.
-const SUPPORTED_IMAGE_TYPES = ["image/png", "image/gif", "image/bmp", "image/jpeg"];
-
-export const DropEvents: React.VFC = () => {
-    const { cols, getCellContent, onColumnResize, setCellValue } = useAllMockedKinds();
-
-    const [highlights, setHighlights] = React.useState<DataEditorProps["highlightRegions"]>([]);
-
-    const [lastDropCell, setLastDropCell] = React.useState<Item | undefined>();
-
-    const onDrop = React.useCallback(
-        (cell: Item, dataTransfer: DataTransfer | null) => {
-            setHighlights([]);
-
-            if (dataTransfer === null) {
-                return;
-            }
-
-            const { files } = dataTransfer;
-            // This only supports one image, for simplicity.
-            if (files.length !== 1) {
-                return;
-            }
-
-            const [file] = files;
-            if (!SUPPORTED_IMAGE_TYPES.includes(file.type)) {
-                return;
-            }
-
-            const imgUrl = URL.createObjectURL(file);
-
-            setCellValue(
-                cell,
-                {
-                    kind: GridCellKind.Image,
-                    data: [imgUrl],
-                    allowOverlay: true,
-                    allowAdd: false,
-                },
-                true,
-                true
-            );
-
-            setLastDropCell(cell);
-        },
-        [setCellValue]
-    );
-
-    const onDragOverCell = React.useCallback(
-        (cell: Item, dataTransfer: DataTransfer | null) => {
-            if (dataTransfer === null) {
-                return;
-            }
-
-            const { items } = dataTransfer;
-            // This only supports one image, for simplicity.
-            if (items.length !== 1) {
-                return;
-            }
-
-            const [item] = items;
-            if (!SUPPORTED_IMAGE_TYPES.includes(item.type)) {
-                return;
-            }
-
-            const [col, row] = cell;
-            if (getCellContent(cell).kind === GridCellKind.Image) {
-                setHighlights([
-                    {
-                        color: "#44BB0022",
-                        range: {
-                            x: col,
-                            y: row,
-                            width: 1,
-                            height: 1,
-                        },
-                    },
-                ]);
-            } else {
-                setHighlights([]);
-            }
-        },
-        [getCellContent]
-    );
-
-    const onDragLeave = React.useCallback(() => {
-        setHighlights([]);
-    }, []);
-
-    return (
-        <BeautifulWrapper
-            title="Drop events"
-            description={
-                <>
-                    <Description>
-                        You can drag and drop into cells by using <PropName>onDragOverCell</PropName> and{" "}
-                        <PropName>onDrop</PropName>.
-                    </Description>
-
-                    <div>
-                        {lastDropCell === undefined ? (
-                            <MoreInfo>Nothing dropped, yet</MoreInfo>
-                        ) : (
-                            <>
-                                <MoreInfo>
-                                    You last dropped in cell <PropName>{JSON.stringify(lastDropCell)}</PropName>
-                                </MoreInfo>
-                            </>
-                        )}
-                    </div>
-                </>
-            }>
-            <DataEditor
-                {...defaultProps}
-                getCellContent={getCellContent}
-                columns={cols}
-                onCellEdited={setCellValue}
-                onColumnResize={onColumnResize}
-                rows={1_000}
-                onDrop={onDrop}
-                onDragOverCell={onDragOverCell}
-                onDragLeave={onDragLeave}
-                highlightRegions={highlights}
-                rowMarkers="none"
-            />
-        </BeautifulWrapper>
-    );
-};
-(DropEvents as any).parameters = {
     options: {
         showPanel: false,
     },

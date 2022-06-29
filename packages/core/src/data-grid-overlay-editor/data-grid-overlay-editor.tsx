@@ -16,10 +16,7 @@ import {
     Rectangle,
 } from "../data-grid/data-grid-types";
 import { DataGridOverlayEditorStyle } from "./data-grid-overlay-editor-style";
-import { OverlayImageEditorProps } from "./private/image-overlay-editor";
 import { useStayOnScreen } from "./use-stay-on-screen";
-
-type ImageEditorType = React.ComponentType<OverlayImageEditorProps>;
 
 export interface DataGridOverlayEditorProps {
     readonly target: Rectangle;
@@ -32,7 +29,6 @@ export interface DataGridOverlayEditorProps {
     readonly onFinishEditing: (newCell: GridCell | undefined, movement: readonly [-1 | 0 | 1, -1 | 0 | 1]) => void;
     readonly forceEditMode: boolean;
     readonly highlight: boolean;
-    readonly imageEditorOverride?: ImageEditorType;
     readonly markdownDivCreateNode?: (content: string) => DocumentFragment;
     readonly provideEditor?: ProvideEditorCallback<GridCell>;
     readonly validateCell?: (cell: Item, newValue: EditableGridCell) => boolean | EditableGridCell;
@@ -45,7 +41,6 @@ const DataGridOverlayEditor: React.FunctionComponent<DataGridOverlayEditorProps>
         onFinishEditing: onFinishEditingIn,
         forceEditMode,
         initialValue,
-        imageEditorOverride,
         markdownDivCreateNode,
         highlight,
         className,
@@ -198,7 +193,6 @@ const DataGridOverlayEditor: React.FunctionComponent<DataGridOverlayEditorProps>
                 onFinishedEditing={e => onFinishEditing((e ?? tempValue) as GridCell | undefined, [0, 0])}
                 onKeyDown={onKeyDown}
                 target={target}
-                imageEditorOverride={imageEditorOverride}
                 markdownDivCreateNode={markdownDivCreateNode}
                 isValid={isValid}
             />

@@ -1,11 +1,9 @@
-import type { OverlayImageEditorProps, Theme } from "../..";
+import type { Theme } from "../..";
 import type ImageWindowLoader from "../../common/image-window-loader";
 import type { SpriteManager } from "../data-grid-sprites";
 import type { InnerGridCell, Rectangle, Item } from "../data-grid-types";
 
 export type HoverInfo = readonly [Item, Item];
-
-export type ImageEditorType = React.ComponentType<OverlayImageEditorProps>;
 
 export interface BaseDrawArgs {
     ctx: CanvasRenderingContext2D;
@@ -50,7 +48,6 @@ type ProvideEditorCallback<T extends InnerGridCell> = (
           readonly onFinishedEditing: (newValue?: T) => void;
           readonly isHighlighted: boolean;
           readonly value: T;
-          readonly imageEditorOverride?: ImageEditorType;
           readonly markdownDivCreateNode?: (content: string) => DocumentFragment;
           readonly target: Rectangle;
           readonly forceEditMode: boolean;

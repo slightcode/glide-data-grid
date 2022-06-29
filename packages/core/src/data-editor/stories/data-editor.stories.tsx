@@ -39,56 +39,6 @@ function getDummyData([col, row]: Item): GridCell {
             allowOverlay: false,
         };
     }
-    if (col === 1) {
-        return {
-            kind: GridCellKind.Bubble,
-            data: [
-                `Bub ${col}`,
-                `Bub ${row}`,
-                `Bub ${col}`,
-                `Bub ${row}`,
-                `Bub ${col}`,
-                `Bub ${row}`,
-                `Bub ${col}`,
-                `Bub ${row}`,
-                `Bub ${col}`,
-                `Bub ${row}`,
-            ],
-            allowOverlay: true,
-        };
-    }
-    if (col === 2) {
-        return {
-            kind: GridCellKind.Image,
-            data: [
-                "https://i.imgur.com/5J0BftG.jpg",
-                "https://preview.redd.it/7jlqkp2cyap51.jpg?width=575&auto=webp&s=26fa9ed15b16fb450ee08ed1f2f0ccb5e0223581",
-            ],
-            allowOverlay: true,
-            allowAdd: true,
-        };
-    }
-    if (col === 3) {
-        return {
-            kind: GridCellKind.Markdown,
-            data: `## Markdown has titles
-
-And supports newline chars and automatic wrapping text that just needs to be long enough to trigger it.
-
-
-[Google](https://google.com)
-
-- with
-- lists
-- that
-- can
-- be
-- pretty
-- long
-                    `,
-            allowOverlay: true,
-        };
-    }
     if (col === 4) {
         return {
             kind: GridCellKind.Number,
@@ -121,20 +71,6 @@ And supports newline chars and automatic wrapping text that just needs to be lon
             data: `הרפתקה חדשה`,
             allowOverlay: true,
             readonly: true,
-        };
-    }
-    if (col === 8) {
-        return {
-            kind: GridCellKind.Drilldown,
-            data: [
-                {
-                    text: "Test",
-                    img:
-                        "https://allthatsinteresting.com/wordpress/wp-content/uploads/2012/06/iconic-photos-1950-einstein.jpg",
-                },
-                { text: "No Image" },
-            ],
-            allowOverlay: true,
         };
     }
     return {
@@ -181,62 +117,6 @@ export function Simplenotest() {
             columns={cols}
             rows={1000}
             onColumnResize={onColumnResize}
-        />
-    );
-}
-
-function getDummyRelationColumn(): GridColumn[] {
-    return [
-        {
-            title: "Relation",
-            width: 360,
-            icon: "headerString",
-            hasMenu: true,
-        },
-    ];
-}
-
-function getDummyRelationData([col, row]: Item): GridCell {
-    return {
-        kind: GridCellKind.Drilldown,
-        data: [
-            {
-                text: `Image ${col}-${row}`,
-                img:
-                    "https://allthatsinteresting.com/wordpress/wp-content/uploads/2012/06/iconic-photos-1950-einstein.jpg",
-            },
-            { text: `Text ${col}-${row}` },
-            { text: `More text ${col}-${row}` },
-        ],
-        allowOverlay: true,
-    };
-}
-
-export function RelationColumn() {
-    const [cols, setColumns] = useState(getDummyRelationColumn);
-
-    const onColumnResize = useCallback(
-        (col: GridColumn, newSize: number) => {
-            const index = cols.indexOf(col);
-            const newCols = [...cols];
-            newCols[index] = {
-                ...newCols[index],
-                width: newSize,
-            };
-            setColumns(newCols);
-        },
-        [cols]
-    );
-
-    return (
-        <DataEditor
-            width="100%"
-            getCellContent={getDummyRelationData}
-            columns={cols}
-            rows={1000}
-            onColumnResize={onColumnResize}
-            smoothScrollX={true}
-            smoothScrollY={true}
         />
     );
 }
@@ -584,36 +464,26 @@ export function MarkdownEdits() {
     const dummyCells = useCallback(([col, _row]: Item) => {
         if (col === 0) {
             const editable: EditableGridCell = {
-                data: "text",
                 allowOverlay: true,
-                kind: GridCellKind.Markdown,
+                data: "text",
+                displayData: "text",
+                kind: GridCellKind.Text,
             };
             return editable;
         } else if (col === 1) {
             const editable: EditableGridCell = {
-                data: `text really really really long
-## H1
-
-- this
-- is
-- a
-- longer
-- example
-- to
-- test
-- scroll
-- of
-- preview
-                `,
                 allowOverlay: true,
-                kind: GridCellKind.Markdown,
+                data: "text",
+                displayData: "text",
+                kind: GridCellKind.Text,
             };
             return editable;
         }
         const editable: EditableGridCell = {
-            data: "text",
             allowOverlay: true,
-            kind: GridCellKind.Markdown,
+            data: "text",
+            displayData: "text",
+            kind: GridCellKind.Text,
         };
         return editable;
     }, []);

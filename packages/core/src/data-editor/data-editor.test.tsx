@@ -44,47 +44,24 @@ const makeCell = (cell: Item): GridCell => {
         };
     } else if (col === 4) {
         return {
-            kind: GridCellKind.Drilldown,
-            allowOverlay: false,
-            data: [
-                {
-                    img: "https://cdn.pixabay.com/photo/2017/02/20/18/03/cat-2083492_1280.jpg",
-                    text: "Foobar",
-                },
-            ],
-        };
-    } else if (col === 5) {
-        return {
             kind: GridCellKind.Protected,
             allowOverlay: false,
         };
-    } else if (col === 6) {
-        return {
-            kind: GridCellKind.Bubble,
-            allowOverlay: false,
-            data: ["Foobar"],
-        };
-    } else if (col === 7) {
+    } else if (col === 5) {
         return {
             kind: GridCellKind.Boolean,
             allowOverlay: false,
             data: getMockBooleanData(row),
             readonly: false,
         };
-    } else if (col === 8) {
+    } else if (col === 6) {
         return {
             kind: GridCellKind.Text,
             allowOverlay: true,
             data: `Data: ${col}, ${row}`,
             displayData: `שלום ${col}, ${row}`,
         };
-    } else if (col === 9) {
-        return {
-            kind: GridCellKind.Markdown,
-            allowOverlay: true,
-            data: `# Header: ${col}, ${row}`,
-        };
-    } else if (col === 10) {
+    } else if (col === 7) {
         return {
             kind: GridCellKind.Uri,
             allowOverlay: true,

@@ -132,14 +132,10 @@ export type DrawHeaderCallback = (args: {
 export enum GridCellKind {
     Uri = "uri",
     Text = "text",
-    Image = "image",
     RowID = "row-id",
     Number = "number",
-    Bubble = "bubble",
     Boolean = "boolean",
     Loading = "loading",
-    Markdown = "markdown",
-    Drilldown = "drilldown",
     Protected = "protected",
     Custom = "custom",
 }
@@ -223,19 +219,17 @@ export type InnerGridColumn = SizedGridColumn & { growOffset?: number };
 
 // export type SizedGridColumn = Omit<GridColumn, "width"> & { readonly width: number };
 
-export type ReadWriteGridCell = TextCell | NumberCell | MarkdownCell | UriCell | CustomCell | BooleanCell;
+export type ReadWriteGridCell = TextCell | NumberCell | UriCell | CustomCell | BooleanCell;
 
-export type EditableGridCell = TextCell | ImageCell | BooleanCell | MarkdownCell | UriCell | NumberCell | CustomCell;
+export type EditableGridCell = TextCell | BooleanCell | UriCell | NumberCell | CustomCell;
 
 export type EditableGridCellKind = EditableGridCell["kind"];
 
 export function isEditableGridCell(cell: GridCell): cell is EditableGridCell {
     if (
         cell.kind === GridCellKind.Loading ||
-        cell.kind === GridCellKind.Bubble ||
         cell.kind === GridCellKind.RowID ||
-        cell.kind === GridCellKind.Protected ||
-        cell.kind === GridCellKind.Drilldown
+        cell.kind === GridCellKind.Protected
     ) {
         return false;
     }
@@ -247,12 +241,9 @@ export function isEditableGridCell(cell: GridCell): cell is EditableGridCell {
 export function isTextEditableGridCell(cell: GridCell): cell is ReadWriteGridCell {
     if (
         cell.kind === GridCellKind.Loading ||
-        cell.kind === GridCellKind.Bubble ||
         cell.kind === GridCellKind.RowID ||
         cell.kind === GridCellKind.Protected ||
-        cell.kind === GridCellKind.Drilldown ||
         cell.kind === GridCellKind.Boolean ||
-        cell.kind === GridCellKind.Image ||
         cell.kind === GridCellKind.Custom
     ) {
         return false;
@@ -267,12 +258,11 @@ export function isInnerOnlyCell(cell: InnerGridCell): cell is InnerOnlyGridCell 
 }
 
 export function isReadWriteCell(cell: GridCell): cell is ReadWriteGridCell {
-    if (!isEditableGridCell(cell) || cell.kind === GridCellKind.Image) return false;
+    if (!isEditableGridCell(cell)) return false;
 
     if (
         cell.kind === GridCellKind.Text ||
         cell.kind === GridCellKind.Number ||
-        cell.kind === GridCellKind.Markdown ||
         cell.kind === GridCellKind.Uri ||
         cell.kind === GridCellKind.Custom ||
         cell.kind === GridCellKind.Boolean
@@ -282,14 +272,7 @@ export function isReadWriteCell(cell: GridCell): cell is ReadWriteGridCell {
     assertNever(cell);
 }
 
-export type GridCell =
-    | EditableGridCell
-    | BubbleCell
-    | RowIDCell
-    | LoadingCell
-    | ProtectedCell
-    | DrilldownCell
-    | CustomCell;
+export type GridCell = EditableGridCell | RowIDCell | LoadingCell | ProtectedCell | CustomCell;
 
 type InnerOnlyGridCell = NewRowCell | MarkerCell;
 export type InnerGridCell = GridCell | InnerOnlyGridCell;
@@ -336,18 +319,6 @@ export interface NumberCell extends BaseGridCell {
     readonly readonly?: boolean;
 }
 
-export interface ImageCell extends BaseGridCell {
-    readonly kind: GridCellKind.Image;
-    readonly data: string[];
-    readonly displayData?: string[]; // used for small images for faster scrolling
-    readonly allowAdd: boolean;
-}
-
-export interface BubbleCell extends BaseGridCell {
-    readonly kind: GridCellKind.Bubble;
-    readonly data: string[];
-}
-
 export type ProvideEditorComponent<T extends GridCell> = React.FunctionComponent<{
     readonly onChange: (newValue: T) => void;
     readonly onFinishedEditing: (newValue?: T) => void;
@@ -390,16 +361,6 @@ export interface CustomCell<T extends {} = {}> extends BaseGridCell {
     readonly readonly?: boolean;
 }
 
-export interface DrilldownCellData {
-    readonly text: string;
-    readonly img?: string;
-}
-
-export interface DrilldownCell extends BaseGridCell {
-    readonly kind: GridCellKind.Drilldown;
-    readonly data: readonly DrilldownCellData[];
-}
-
 export interface BooleanCell extends BaseGridCell {
     readonly kind: GridCellKind.Boolean;
     readonly data: boolean | BooleanEmpty | BooleanIndeterminate;
@@ -426,12 +387,6 @@ export function booleanCellIsEditable(cell: BooleanCell): boolean {
 
 export interface RowIDCell extends BaseGridCell {
     readonly kind: GridCellKind.RowID;
-    readonly data: string;
-    readonly readonly?: boolean;
-}
-
-export interface MarkdownCell extends BaseGridCell {
-    readonly kind: GridCellKind.Markdown;
     readonly data: string;
     readonly readonly?: boolean;
 }

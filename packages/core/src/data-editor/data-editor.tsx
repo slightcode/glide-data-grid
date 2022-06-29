@@ -37,7 +37,6 @@ import {
 } from "../data-grid/data-grid-types";
 import DataGridSearch, { DataGridSearchProps } from "../data-grid-search/data-grid-search";
 import { browserIsOSX } from "../common/browser-detect";
-import { OverlayImageEditorProps } from "../data-grid-overlay-editor/private/image-overlay-editor";
 import { ThemeProvider, useTheme } from "styled-components";
 import { getDataEditorTheme, makeCSSStyle, Theme } from "../common/styles";
 import { DataGridRef } from "../data-grid/data-grid";
@@ -105,8 +104,6 @@ type Props = Omit<
     | "translateX"
     | "translateY"
 >;
-
-type ImageEditorType = React.ComponentType<OverlayImageEditorProps>;
 
 type EditListItem = { location: Item; value: EditableGridCell };
 
@@ -232,7 +229,6 @@ export interface DataEditorProps extends Props {
     readonly minColumnWidth?: DataGridSearchProps["minColumnWidth"];
     readonly maxColumnWidth?: DataGridSearchProps["maxColumnWidth"];
 
-    readonly imageEditorOverride?: ImageEditorType;
     readonly markdownDivCreateNode?: (content: string) => DocumentFragment;
 
     readonly provideEditor?: ProvideEditorCallback<GridCell>;
@@ -330,7 +326,6 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
         rowHeight = 34,
         headerHeight = 36,
         rowMarkerWidth: rowMarkerWidthRaw,
-        imageEditorOverride,
         getRowThemeOverride,
         markdownDivCreateNode,
     } = p;
@@ -788,7 +783,6 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                             };
                             break;
                         case GridCellKind.Text:
-                        case GridCellKind.Markdown:
                         case GridCellKind.Uri:
                             content = {
                                 ...content,
@@ -2319,7 +2313,6 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                     }
                     switch (inner.kind) {
                         case GridCellKind.Text:
-                        case GridCellKind.Markdown:
                         case GridCellKind.Uri: {
                             return {
                                 location: target,
@@ -2885,7 +2878,6 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                         id={overlayID}
                         className={p.experimental?.isSubGrid === true ? "click-outside-ignore" : undefined}
                         provideEditor={provideEditor}
-                        imageEditorOverride={imageEditorOverride}
                         onFinishEditing={onFinishEditing}
                         markdownDivCreateNode={markdownDivCreateNode}
                     />

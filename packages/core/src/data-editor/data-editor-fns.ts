@@ -240,21 +240,15 @@ export function copyToClipboard(
             case GridCellKind.Text:
             case GridCellKind.Number:
                 return escape(raw ? cell.data?.toString() ?? "" : cell.displayData);
-            case GridCellKind.Markdown:
             case GridCellKind.RowID:
             case GridCellKind.Uri:
                 return escape(cell.data);
-            case GridCellKind.Image:
-            case GridCellKind.Bubble:
-                return cell.data.reduce((pv, cv) => `${escape(pv)},${escape(cv)}`);
             case GridCellKind.Boolean:
                 return formatBoolean(cell.data);
             case GridCellKind.Loading:
                 return raw ? "" : "#LOADING";
             case GridCellKind.Protected:
                 return raw ? "" : "************";
-            case GridCellKind.Drilldown:
-                return cell.data.map(i => i.text).reduce((pv, cv) => `${escape(pv)},${escape(cv)}`);
             case GridCellKind.Custom:
                 return escape(cell.copyData);
             default:

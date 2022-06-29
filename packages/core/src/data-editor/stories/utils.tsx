@@ -64,23 +64,12 @@ export function lossyCopyData<T extends EditableGridCell>(source: EditableGridCe
             ...target,
             data: isTruthy(sourceData) ? true : false,
         };
-    } else if (target.kind === GridCellKind.Image) {
-        if (isArray(sourceData)) {
-            return {
-                ...target,
-                data: [sourceData[0]],
-            };
-        }
-        return {
-            ...target,
-            data: [sourceData?.toString() ?? ""],
-        };
     } else if (target.kind === GridCellKind.Number) {
         return {
             ...target,
             data: 0,
         };
-    } else if (target.kind === GridCellKind.Text || target.kind === GridCellKind.Markdown) {
+    } else if (target.kind === GridCellKind.Text) {
         if (isArray(sourceData)) {
             return {
                 ...target,
@@ -279,24 +268,6 @@ function getResizableColumns(amount: number, group: boolean): GridColumnWithMock
                     displayData: lastName,
                     data: lastName,
                     allowOverlay: true,
-                    readonly: true,
-                };
-            },
-        },
-        {
-            title: "Avatar",
-            id: "Avatar",
-            group: group ? "Info" : undefined,
-            icon: GridColumnIcon.HeaderImage,
-            hasMenu: false,
-            getContent: () => {
-                const n = Math.round(Math.random() * 100);
-                return {
-                    kind: GridCellKind.Image,
-                    data: [`https://picsum.photos/id/${n}/900/900`],
-                    displayData: [`https://picsum.photos/id/${n}/40/40`],
-                    allowOverlay: true,
-                    allowAdd: false,
                     readonly: true,
                 };
             },

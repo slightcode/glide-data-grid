@@ -41,7 +41,7 @@ npm i @glideapps/glide-data-grid
 You may also need to install the peer dependencies if you don't have them already:
 
 ```
-npm i lodash marked react-responsive-carousel styled-components
+npm i lodash styled-components
 ```
 
 Create a new `DataEditor` wherever you need to display lots and lots of data
@@ -73,14 +73,14 @@ function getData([col, row]: Item): GridCell {
             kind: GridCellKind.Text,
             data: person.firstName,
             allowOverlay: false,
-            displayData: person.firstName
+            displayData: person.firstName,
         };
     } else if (col === 1) {
         return {
             kind: GridCellKind.Text,
             data: person.lastName,
             allowOverlay: false,
-            displayData: person.lastName
+            displayData: person.lastName,
         };
     } else {
         throw new Error();
@@ -139,6 +139,7 @@ There are some hacks you can do like setting timers and entering into a "low fid
 The easiest way to use the grid with Next is to create a component which wraps up your grid and then import it as a dynamic.
 
 home.tsx
+
 ```tsx
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
@@ -164,6 +165,7 @@ export const Home: NextPage = () => {
 ```
 
 grid.tsx
+
 ```tsx
 import React from "react";
 import DataEditor from "@glideapps/glide-data-grid";

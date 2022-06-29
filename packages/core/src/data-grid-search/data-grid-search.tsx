@@ -137,18 +137,10 @@ const DataGridSearch: React.FunctionComponent<DataGridSearchProps> = p => {
                                 testString = cell.displayData;
                                 break;
                             case GridCellKind.Uri:
-                            case GridCellKind.Markdown:
                                 testString = cell.data;
                                 break;
                             case GridCellKind.Boolean:
                                 testString = typeof cell.data === "boolean" ? cell.data.toString() : undefined;
-                                break;
-                            case GridCellKind.Image:
-                            case GridCellKind.Bubble:
-                                // I know its lazy, but unless someone is actually
-                                // searching for the whale emoji, this is pretty side effect
-                                // free. And ya know... it's nice and easy to do...
-                                testString = cell.data.join("🐳");
                                 break;
                             case GridCellKind.Custom:
                                 testString = cell.copyData;
