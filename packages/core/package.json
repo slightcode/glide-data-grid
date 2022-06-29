@@ -1,6 +1,10 @@
 {
-    "name": "@glideapps/glide-data-grid",
-    "version": "4.2.0",
+    "name": "@slightcode/glide-data-grid",
+    "private": false,
+    "publishConfig": {
+        "access": "public"
+    },
+    "version": "4.2.1",
     "description": "Super fast, pure canvas Data Grid Editor",
     "sideEffects": false,
     "type": "module",
@@ -24,7 +28,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/glideapps/glide-data-grid.git",
+        "url": "git+https://github.com/slightcode/glide-data-grid.git",
         "directory": "packages/core"
     },
     "keywords": [
