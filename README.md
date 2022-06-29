@@ -1,3 +1,7 @@
+<h2 align="center">
+  This is a fork of Glide's Data Grid with changes made for <a href="https://slight.co">Slight</a>.
+</h2>
+
 <h1 align="center">
   <img src="https://raw.githubusercontent.com/glideapps/glide-data-grid/master/media/icon.png" width="224px"/><br/>
   <b>Glide Data Grid</b>
