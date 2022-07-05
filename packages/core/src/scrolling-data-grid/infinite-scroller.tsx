@@ -24,6 +24,7 @@ interface Props {
 
 export const ScrollRegionStyle = styled.div`
     .dvn-scroller {
+        overscroll-behavior: contain;
         overflow: ${browserIsSafari ? "scroll" : "auto"};
         transform: translate3d(0, 0, 0);
     }
