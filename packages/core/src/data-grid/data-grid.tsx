@@ -32,6 +32,7 @@ import {
 import { SpriteManager, SpriteMap } from "./data-grid-sprites";
 import { useDebouncedMemo, useEventListener } from "../common/utils";
 import makeRange from "lodash/range";
+import clamp from "lodash/clamp";
 import {
     drawCell,
     drawGrid,
@@ -47,7 +48,7 @@ import { AnimationManager, StepCallback } from "./animation-manager";
 import { browserIsFirefox } from "../common/browser-detect";
 import { CellRenderers } from "./cells";
 import { useAnimationQueue } from "./use-animation-queue";
-import { clamp } from "lodash";
+import { useCurrentDpr } from "./use-current-dpr";
 
 export interface DataGridProps {
     readonly width: number;
@@ -238,6 +239,7 @@ const DataGrid: React.ForwardRefRenderFunction<DataGridRef, DataGridProps> = (p,
     const [hoveredItemInfo, setHoveredItemInfo] = React.useState<[Item, readonly [number, number]] | undefined>();
     const [hoveredOnEdge, setHoveredOnEdge] = React.useState<boolean>();
     const overlayRef = React.useRef<HTMLCanvasElement | null>(null);
+    const currentDpr = useCurrentDpr();
 
     const [lastWasTouch, setLastWasTouch] = React.useState(false);
     const lastWasTouchRef = React.useRef(lastWasTouch);
@@ -478,21 +480,78 @@ const DataGrid: React.ForwardRefRenderFunction<DataGridRef, DataGridProps> = (p,
     hoverInfoRef.current = hoveredItemInfo;
 
     const lastArgsRef = React.useRef<DrawGridArg>();
-    const draw = React.useCallback(() => {
-        const canvas = ref.current;
-        const overlay = overlayRef.current;
-        if (canvas === null || overlay === null) return;
+    const draw = React.useCallback(
+        (redrawAll: boolean = false) => {
+            const canvas = ref.current;
+            const overlay = overlayRef.current;
+            if (canvas === null || overlay === null) return;
 
-        const last = lastArgsRef.current;
-        const current = {
-            canvas,
-            headerCanvas: overlay,
+            const last = lastArgsRef.current;
+            const current = {
+                canvas,
+                headerCanvas: overlay,
+                width,
+                height,
+                cellXOffset,
+                cellYOffset,
+                translateX: Math.round(translateX),
+                translateY: Math.round(translateY),
+                mappedColumns,
+                enableGroups,
+                freezeColumns,
+                dragAndDropState,
+                theme,
+                headerHeight,
+                groupHeaderHeight,
+                disabledRows: disabledRows ?? CompactSelection.empty(),
+                rowHeight,
+                verticalBorder,
+                isResizing,
+                isFocused,
+                selection,
+                fillHandle,
+                lastRowSticky,
+                rows,
+                getCellContent,
+                getGroupDetails: getGroupDetails ?? (name => ({ name })),
+                getRowThemeOverride,
+                drawCustomCell,
+                drawHeaderCallback: drawHeader,
+                prelightCells,
+                highlightRegions,
+                imageLoader,
+                lastBlitData,
+                damage: damageRegion.current,
+                hoverValues: hoverValues.current,
+                hoverInfo: hoverInfoRef.current,
+                spriteManager,
+                scrolling,
+                hyperWrapping: p.experimental?.hyperWrapping ?? false,
+                touchMode: lastWasTouch,
+                enqueue: enqueueRef.current,
+            };
+
+            // This confusing bit of code due to some poor design. Long story short, the damage property is only used
+            // with what is effectively the "last args" for the last normal draw anyway. We don't want the drawing code
+            // to look at this and go "shit dawg, nothing changed" so we force it to draw frash, but the damage restricts
+            // the draw anyway.
+            //
+            // Dear future Jason, I'm sorry. It was expedient, it worked, and had almost zero perf overhead. THe universe
+            // basically made me do it. What choice did I have?
+            if (current.damage === undefined && !redrawAll) {
+                lastArgsRef.current = current;
+                drawGrid(current, last);
+            } else {
+                drawGrid(current, undefined);
+            }
+        },
+        [
             width,
             height,
             cellXOffset,
             cellYOffset,
-            translateX: Math.round(translateX),
-            translateY: Math.round(translateY),
+            translateX,
+            translateY,
             mappedColumns,
             enableGroups,
             freezeColumns,
@@ -500,7 +559,7 @@ const DataGrid: React.ForwardRefRenderFunction<DataGridRef, DataGridProps> = (p,
             theme,
             headerHeight,
             groupHeaderHeight,
-            disabledRows: disabledRows ?? CompactSelection.empty(),
+            disabledRows,
             rowHeight,
             verticalBorder,
             isResizing,
@@ -510,73 +569,19 @@ const DataGrid: React.ForwardRefRenderFunction<DataGridRef, DataGridProps> = (p,
             lastRowSticky,
             rows,
             getCellContent,
-            getGroupDetails: getGroupDetails ?? (name => ({ name })),
+            getGroupDetails,
             getRowThemeOverride,
             drawCustomCell,
-            drawHeaderCallback: drawHeader,
+            drawHeader,
             prelightCells,
             highlightRegions,
             imageLoader,
-            lastBlitData,
-            damage: damageRegion.current,
-            hoverValues: hoverValues.current,
-            hoverInfo: hoverInfoRef.current,
             spriteManager,
             scrolling,
-            hyperWrapping: p.experimental?.hyperWrapping ?? false,
-            touchMode: lastWasTouch,
-            enqueue: enqueueRef.current,
-        };
-
-        // This confusing bit of code due to some poor design. Long story short, the damage property is only used
-        // with what is effectively the "last args" for the last normal draw anyway. We don't want the drawing code
-        // to look at this and go "shit dawg, nothing changed" so we force it to draw frash, but the damage restricts
-        // the draw anyway.
-        //
-        // Dear future Jason, I'm sorry. It was expedient, it worked, and had almost zero perf overhead. THe universe
-        // basically made me do it. What choice did I have?
-        if (current.damage === undefined) {
-            lastArgsRef.current = current;
-            drawGrid(current, last);
-        } else {
-            drawGrid(current, undefined);
-        }
-    }, [
-        width,
-        height,
-        cellXOffset,
-        cellYOffset,
-        translateX,
-        translateY,
-        mappedColumns,
-        enableGroups,
-        freezeColumns,
-        dragAndDropState,
-        theme,
-        headerHeight,
-        groupHeaderHeight,
-        disabledRows,
-        rowHeight,
-        verticalBorder,
-        isResizing,
-        isFocused,
-        selection,
-        fillHandle,
-        lastRowSticky,
-        rows,
-        getCellContent,
-        getGroupDetails,
-        getRowThemeOverride,
-        drawCustomCell,
-        drawHeader,
-        prelightCells,
-        highlightRegions,
-        imageLoader,
-        spriteManager,
-        scrolling,
-        p.experimental?.hyperWrapping,
-        lastWasTouch,
-    ]);
+            p.experimental?.hyperWrapping,
+            lastWasTouch,
+        ]
+    );
 
     const lastDrawRef = React.useRef(draw);
     React.useLayoutEffect(() => {
@@ -611,6 +616,10 @@ const DataGrid: React.ForwardRefRenderFunction<DataGridRef, DataGridProps> = (p,
     );
 
     imageLoader.setCallback(damageInternal);
+
+    React.useEffect(() => {
+        lastDrawRef.current(true);
+    }, [currentDpr]);
 
     const [overFill, setOverFill] = React.useState(false);
 
